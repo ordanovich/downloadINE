@@ -2,7 +2,6 @@
 # install_github("mrdwab/SOfun")
 
 library(RSQLite) 
-
 library(RJSONIO)
 library(SOfun)
 library(data.table)
@@ -19,7 +18,7 @@ library(openxlsx)
 library(rmarkdown)
 library(highcharter)
 library(plotly)
-library(sf)
+# library(sf)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -65,26 +64,6 @@ body <- dashboardBody(
                title = "Consult available statistical operations",
                icon = "laptop-code",
                color = "olive",
-               
-               boxPlus(title = "Retrieve the list of operations from INEBase",
-                       background = "yellow",
-                       collapsed = T,
-                       collapsible = T,
-                       closable = F,
-                       width = 12,
-                       
-                       tags$code("operaciones <- RJSONIO::fromJSON('http://servicios.ine.es/wstempus/js/ES/OPERACIONES_DISPONIBLES')"),
-                       tags$br(),
-                       tags$code("SOfun::col_flatten(data.frame(do.call('rbind', operaciones)), names(which(sapply(x, is.list))), drop = TRUE) -> x"),
-                       tags$br(),
-                       tags$code("operaciones <- as.data.frame(x)"),
-                       tags$br(),
-                       tags$code("names(operaciones) <- gsub('_1','', names(operaciones))"),
-                       tags$br(),
-                       tags$code("operaciones$CodIOE <- ifelse(operaciones$Cod_IOE != '', paste0('IOE',operaciones$Cod_IOE), '')")
-               ),
-               
-               
                
                
                footer = fluidRow(
@@ -141,150 +120,6 @@ body <- dashboardBody(
                )
              )
              
-             
-             ,timelineItem(
-               title = "Programatically retrieve the data",
-               icon = "laptop-code",
-               color = "olive",
-               
-               footer = fluidRow(
-                 
-                 column(width = 4,
-                        
-                        boxPlus(title = "Retrieve available series for a particular table",
-                                         background = "yellow",
-                                         collapsed = T,
-                                         collapsible = T,
-                                         closable = F,
-                                         width = 12,
-                                         
-                                         fluidRow(
-                                           
-                                           column(width = 12,
-                                                  
-                                                  "Select corresponding table code, e.g. id 9663 (Poblacion residente por fecha, sexo y edad -- Cifras de Poblacion)",
-                                                  tags$br(),
-                                                  tags$code("i <- 9663"),
-                                                  tags$br(),
-                                                  tags$code("fromJSON(paste0('http://servicios.ine.es/wstempus/js/ES/SERIES_TABLA/', i)) -> x"),
-                                                  tags$br(),
-                                                  "To make sure the request was completed set a condition to proceed further",
-                                                  tags$br(),
-                                                  tags$code("if(class(x) == 'list' & length(x) > 0) {"),
-                                                  tags$br(),
-                                                  "Retrieve and process the data",
-                                                  tags$br(),
-                                                  tags$code("rbind.fill(lapply(x, function(x) as.data.frame(t(x)))) -> x"),
-                                                  tags$br(),
-                                                  "Do not forget to wrap up the loop",
-                                                  tags$br(),
-                                                  tags$code("}")
-                                           )
-                                         )
-                                         
-                 )),
-                 
-                 
-                 column(width = 4,    
-                        
-                        boxPlus(title = "Retrieve available data from the series",
-                                background = "yellow",
-                                collapsed = T,
-                                collapsible = T,
-                                closable = F,
-                                width = 12,
-                                
-                                fluidRow(
-                                  
-                                  column(width = 12,
-                                         
-                                         "First unlist the object obtained on the previous step",
-                                         tags$br(),
-                                         tags$code("lst <- lapply(x , unlist)"),
-                                         tags$br(),
-                                         "Obtain the codes for data series",
-                                         tags$br(),
-                                         tags$code("lst <- as.data.frame(rlist::list.cbind(lst))%>%"),
-                                         tags$br(),
-                                         tags$code("mutate_if(is.factor, as.character) %>%"),
-                                         tags$br(),
-                                         tags$code("dplyr::select(COD, Nombre) %>%"),
-                                         tags$br(),
-                                         tags$code("distinct()"),
-                                         tags$br(),
-                                         "Loop through these codes to retrieve all availabla data and store it inside an initially empty list 'datos_serie'",
-                                         tags$br(),
-                                         tags$code("for (t in lst$COD) {"),
-                                         tags$br(),
-                                         tags$code("fromJSON(paste0('http://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/', t, '?date=19000101:')) -> x"),
-                                         tags$br(),
-                                         tags$code("if(length(x) > 0) {name <- lst[lst$COD == t, 'Nombre']; datos_serie[[name]] <- x}"),
-                                         tags$br(),
-                                         tags$code("}")
-                                         
-                                  )
-                                )
-                        )),
-                 
-                 
-                 column(width = 4,
-                        
-                        boxPlus(title = "Transform the data",
-                                background = "yellow",
-                                collapsed = T,
-                                collapsible = T,
-                                closable = F,
-                                width = 12,
-                                
-                                fluidRow(
-                                  
-                                  column(width = 12,
-                                         
-                                         "Create an empty list to store your clean data in",
-                                         tags$br(),
-                                         tags$code("datos_serie.df <- list()"),
-                                         tags$br(),
-                                         "Iterate through each element of the list filled in the previous step",
-                                         tags$br(),
-                                         tags$code("for (i in names(datos_serie)) {"),
-                                         tags$br(),
-                                         tags$code("x <- as.data.frame(rlist::list.cbind(datos_serie[[i]]$Data))"),
-                                         tags$br(),
-                                         tags$code("if (length(x) > 0) {"),
-                                         tags$br(),
-                                         tags$code("x <- lapply(x, unlist)"),
-                                         tags$br(),
-                                         tags$code("table.name <- datos_serie[[i]]$Nombre"),
-                                         tags$br(),
-                                         tags$code("as.data.frame(rlist::list.rbind(x)) %>%"),
-                                         tags$br(),
-                                         tags$code("mutate_if(is.factor, as.character) %>%"),
-                                         tags$br(),
-                                         tags$code("mutate(Variable = table.name) %>%"),
-                                         tags$br(),
-                                         tags$code("mutate(Fecha = lubridate::as_datetime(Fecha/1000, origin ='1970-01-01', tz = 'Europe/Madrid')) -> x"),
-                                         tags$br(),
-                                         tags$code("datos_serie.df[[i]] <- x}"),
-                                         tags$br(),
-                                         tags$code("}"),
-                                         tags$br(),
-                                         "Separate variables into columns and merge into a uniform data frame",
-                                         tags$br(),
-                                         tags$code("rbindlist(datos_serie.df, fill=T) -> datos_serie.df"),
-                                         tags$br(),
-                                         tags$code("strsplit(datos_serie.df$Variable, '. ', fixed = TRUE) -> vars_splitted"),
-                                         tags$br(),
-                                         tags$code("rbind.fill(lapply(vars_splitted, function(x)as.data.frame(t(x)))) -> vars_splitted_df"),
-                                         tags$br(),
-                                         tags$code("vars_splitted_df %>% mutate_if(is.factor, as.character) -> vars_splitted_df"),
-                                         tags$br(),
-                                         tags$code("cbind(datos_serie.df, vars_splitted_df) -> datos_serie.df")
-                                  )
-                                )
-                                )
-                        )
-                 )
-               )
              
              , timelineItem(
                title = "View and download processed data for selected tables",
@@ -354,35 +189,6 @@ body <- dashboardBody(
                )
              )
              
-             # , timelineItem(
-             #   title = "Summary map",
-             #   icon = "map-marked-alt",
-             #   color = "yellow",
-             # 
-             #   footer = fluidRow(
-             # 
-             #     column(width = 12,
-             # 
-             #            fluidRow(
-             # 
-             #              column(width = 6,
-             # 
-             #                     htmlOutput("map_grouping_var")
-             #              )
-             # 
-             #            )
-             # 
-             #            ,fluidRow(
-             # 
-             #              column(width = 12,
-             # 
-             #                     plotOutput("map") %>%
-             #                       withSpinner(color="#DC143C", type = 4))
-             #            )
-             #     )
-             # 
-             #   )
-             # )
              
              
              
@@ -444,8 +250,8 @@ shinyApp(
       
       if(length(x) > 0) {
         
-        x <- as.data.frame(x) %>%
-          mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1"))
+        x <- as.data.frame(x) 
+         # %>% mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1"))
       }
       
       x
@@ -527,8 +333,8 @@ shinyApp(
         
         if(class(x) == "list" & length(x) > 0) {
           
-          rbind.fill(lapply(x, function(x) as.data.frame(t(x)))) %>%
-            mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) -> x
+          rbind.fill(lapply(x, function(x) as.data.frame(t(x)))) -> x
+            # %>%mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) 
           
           ss[[k]] <- x
           
@@ -548,7 +354,7 @@ shinyApp(
           
           lst <- as.data.frame(rlist::list.cbind(lst))%>%
             mutate_if(is.factor, as.character) %>%
-            mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
+            # mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
             dplyr::select(COD, Nombre) %>%
             distinct()
           
@@ -590,7 +396,7 @@ shinyApp(
           x <-  as.data.frame(rlist::list.rbind(x)) %>%
             mutate_if(is.factor, as.character) %>%
             mutate(Variable = table.name) %>%
-            mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
+            # mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
             mutate(Fecha = lubridate::as_datetime(Fecha/1000, origin ="1970-01-01", tz = "Europe/Madrid"))
           # dplyr::select(Fecha, Valor, Variable)
           
