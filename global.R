@@ -57,20 +57,6 @@ myModal3 <- function() {
             )
 }
 
-myFun <- function(data) {
-  ListCols <- sapply(data, is.list)
-  cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))
-}
-ms_to_date = function(ms, t0="1970-01-01", timezone) {
-  ## @ms: a numeric vector of milliseconds (big integers of 13 digits)
-  ## @t0: a string of the format "yyyy-mm-dd", specifying the date that
-  ##      corresponds to 0 millisecond
-  ## @timezone: a string specifying a timezone that can be recognized by R
-  ## return: a POSIXct vector representing calendar dates and times        
-  sec = ms / 1000
-  as.POSIXct(sec, origin=t0, tz=timezone)
-}
-
 
 ## operaciones -----
 
