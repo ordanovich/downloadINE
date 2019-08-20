@@ -40,7 +40,7 @@ names(operaciones) <- gsub("_1","", names(operaciones))
 operaciones$Nombre <- iconv(operaciones$Nombre, from="UTF-8", to="LATIN1")
 operaciones$CodIOE <- ifelse(operaciones$Cod_IOE != "", paste0("IOE",operaciones$Cod_IOE), "")
 ```
-> Here are some of the statistical operations directly related with Health and Demographic topic:
+> Here are some of the statistical operations directly related with Population Health aspects and Demographic processes:
 
 ```r
 c("IOE30321", # Cifras de Poblacion
@@ -60,3 +60,34 @@ c("IOE30321", # Cifras de Poblacion
   "IOE30270"  # Proyecciones de Poblacion a Largo Plazo
 ) -> tables
 ```
+
+In order to work further only with those datasets you could filter your data frame with the available operations by the corresponding codes:
+
+```r
+operaciones[operaciones$CodIOE %in% tables,c("Nombre", "CodIOE")] -> operaciones 
+```
+
+## Available tables for selected operations
+
+```r
+tt <- list()
+
+for (i in sample(operaciones$CodIOE,1)) {
+  
+  link <- paste0("http://servicios.ine.es/wstempus/js/ES/TABLAS_OPERACION/",i)
+  
+  fromJSON(link) -> x
+  
+  rbindlist(x, fill=TRUE) -> x
+  
+  if(length(x) > 0) {
+    
+    x <- as.data.frame(x) %>%
+      mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1"))
+    tt[[i]] <- x
+  }
+}
+```
+
+> Note that we use the `sample()` function for the demonstration purposes. If you want to loop through the entire selection remove the sampling part.
+
