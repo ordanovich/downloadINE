@@ -19,7 +19,7 @@ devtools::install_github("mrdwab/SOfun")
 pacman::p_load(RSQLite, magrittr, dplyr, RJSONIO, SOfun, data.table, plyr)
 ```
 
-### Available operations
+### :one: Available operations
 
 ```r
 operaciones <-  "http://servicios.ine.es/wstempus/js/ES/OPERACIONES_DISPONIBLES"
@@ -60,7 +60,7 @@ In order to work further only with those datasets you could filter your data fra
 operaciones[operaciones$CodIOE %in% tables,c("Nombre", "CodIOE")] -> operaciones 
 ```
 
-### Available tables for the selected operations
+### :two: Available tables for the selected operations
 
 ```r
 tt <- list()
@@ -84,7 +84,7 @@ for (i in sample(operaciones$CodIOE,1)) {
 
 > Note that we use the `sample()` function for the demonstration purposes. If you want to loop through the entire selection remove the sampling part.
 
-### Available data series
+### :three: Available data series
 
 ```r
 ss <- list()
@@ -110,7 +110,7 @@ for (i in nn.tt) {
   
 }
 ```
-### Raw data extraction
+### :four: Raw data extraction
 
 ```r
 
@@ -145,7 +145,7 @@ for (i in names(ss)) {
 }
 ```
 
-### Data clean-up & re-structuring
+### :five: Data clean-up & re-structuring
 
 ```r
 datos_serie.df <- list()
