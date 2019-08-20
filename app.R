@@ -18,7 +18,7 @@ library(openxlsx)
 library(rmarkdown)
 library(highcharter)
 library(plotly)
-# library(sf)
+library(sf)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -57,8 +57,6 @@ body <- dashboardBody(
              timelineStart(color = "gray"),
              
              tags$br(),tags$br(),
-             
-             # timelineLabel("Step 1", color = "teal"),
              
              timelineItem(
                title = "Consult available statistical operations",
@@ -153,6 +151,7 @@ body <- dashboardBody(
                )
              )
              
+             
              , timelineItem(
                title = "Add geometry and download spatial data",
                icon = "download",
@@ -164,27 +163,28 @@ body <- dashboardBody(
                         
                         fluidRow(
                           
-                          column(width = 6, htmlOutput("check_var")),
+                          column(width = 4, htmlOutput("check_var")),
                           
-                          column(width = 6, uiOutput("geo_preference"))),
+                          column(width = 4, uiOutput("geo_preference")),
+                          
+                          column(width = 4, htmlOutput("geo_vars"))),
                         
                         fluidRow(
                           
-                          column(width = 6, dataTableOutput("check_var_unique_value")),
+                          column(width = 12, dataTableOutput("check_var_unique_value"))
                           
-                          column(width = 6, htmlOutput("geo_vars"))),
+                          ),
                         
-                        fluidRow(
-                          
-                          column(width = 6),
-                          
-                          column(width = 6
-                                 
-                                 ,actionButton("act1","Download shapefile")
-                                 
-                          )
-                          
-                        )
+                        fluidRow(column(width = 12, 
+                                        dataTableOutput("spatial_table"),
+                                        
+                                        downloadButton('downloadData', 
+                                                       'Download .RData with spatial dataframe')
+                                               
+                                               
+                                        
+                                        )
+                                 )
                  )
                )
              )
@@ -250,8 +250,8 @@ shinyApp(
       
       if(length(x) > 0) {
         
-        x <- as.data.frame(x) 
-         # %>% mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1"))
+        x <- as.data.frame(x) %>%
+                    mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1"))
       }
       
       x
@@ -333,8 +333,8 @@ shinyApp(
         
         if(class(x) == "list" & length(x) > 0) {
           
-          rbind.fill(lapply(x, function(x) as.data.frame(t(x)))) -> x
-            # %>%mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) 
+          rbind.fill(lapply(x, function(x) as.data.frame(t(x)))) %>%
+                                mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) -> x 
           
           ss[[k]] <- x
           
@@ -354,7 +354,7 @@ shinyApp(
           
           lst <- as.data.frame(rlist::list.cbind(lst))%>%
             mutate_if(is.factor, as.character) %>%
-            # mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
+            mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
             dplyr::select(COD, Nombre) %>%
             distinct()
           
@@ -396,9 +396,9 @@ shinyApp(
           x <-  as.data.frame(rlist::list.rbind(x)) %>%
             mutate_if(is.factor, as.character) %>%
             mutate(Variable = table.name) %>%
-            # mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
-            mutate(Fecha = lubridate::as_datetime(Fecha/1000, origin ="1970-01-01", tz = "Europe/Madrid"))
-          # dplyr::select(Fecha, Valor, Variable)
+            mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
+            mutate(Fecha = lubridate::as_datetime(Fecha/1000, origin ="1970-01-01", tz = "Europe/Madrid")) %>%
+            dplyr::select(Fecha, Valor, Variable)
           
           datos_serie.df[[i]] <- x
         }
@@ -506,7 +506,6 @@ shinyApp(
                          y=Valor,
                          group = Variable,
                          color = Variable) %>%
-        # hc_rangeSelector(selected = 2) %>%
         hc_add_theme(hc_theme_flat()) %>%
         hc_legend(enabled = F) %>%
         hc_tooltip(pointFormat = "{point.Variable}:{point.Valor:.0f}")%>%
@@ -890,58 +889,38 @@ shinyApp(
       
     })
     
+    output$spatial_table <- renderDataTable(
+                
+                datatable(spatial_data() %>% st_drop_geometry(),
+                          extensions = 'Buttons',
+                          options = list(
+                                      scrollX = TRUE,
+                                      dom = 'Bfrtip',
+                                      buttons = list(
+                                                  "copy",
+                                                  list(
+                                                              extend = "collection",
+                                                              text = 'Download entire dataset',
+                                                              action = DT::JS("function ( e, dt, node, config ) {
+                                                                              Shiny.setInputValue('test', true, {priority: 'event'});
+  }")
+                    )
+                                                              )
+                                                  )
+                                      ))   
     
     
-    output$map_grouping_var <- renderUI({
-
-      selectInput(inputId = "map_grouping_var",
-                  label = "Select grouping variable",
-                  choices = sort(names(spatial_data())[names(spatial_data()) %in% paste0("V", 1:25)]),
-                  selected = "V2"
-      )
-
-    })
-    
-    
-    output$map <- renderPlot({
-
-      ggplot(spatial_data() %>%
-               mutate(Anyo = lubridate::year(Fecha)) %>%
-               dplyr::select(NAMEUNIT, Anyo, UQ(as.name(input$map_grouping_var)), Valor) %>%
-               set_colnames(c("Unit", "Year", "GroupingVar", "Value", "geometry")) %>%
-               group_by(Unit, Year, GroupingVar) %>%
-               summarize(Value = mean(Value, na.rm = T))) +
-        geom_sf(aes(fill = Value),lwd = 0) +
-        scale_fill_viridis_c(option = "magma",begin = 0.1) +
-        facet_wrap(Year ~ GroupingVar, ncol = 10)
-
-    })
-
-    output$download_shp <- downloadHandler(
-      filename = "shapefile.zip",
-      content = function(file) {
-        data = spatial_data() # I assume this is a reactive object
-        # create a temp folder for shp files
-        temp_shp <- tempdir()
-        # write shp files
-        writeOGR(data, temp_shp, "trk_buff", "ESRI Shapefile",
-                 overwrite_layer = TRUE)
-        # zip all the shp files
-        zip_file <- file.path(temp_shp, "trk_buff_shp.zip")
-        shp_files <- list.files(temp_shp,
-                                "trk_buff",
-                                full.names = TRUE)
-        # the following zip method works for me in linux but substitute with whatever method working in your OS
-        zip_command <- paste("zip -j",
-                             zip_file,
-                             paste(shp_files, collapse = " "))
-        system(zip_command)
-        # copy the zip file to the file argument
-        file.copy(zip_file, file)
-        # remove all the files created
-        file.remove(zip_file, shp_files)
-      }
+    output$downloadData <- downloadHandler(
+                filename <- function(){
+                            paste("INE_spatial_data.RData")
+                },
+                
+                content = function(file) {
+                            dat <- spatial_data()
+                            save(dat, file = file)
+                }
     )
+    
     
     
   }

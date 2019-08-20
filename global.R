@@ -18,7 +18,7 @@ library(shinydashboardPlus)
 library(htmlwidgets)
 library(openxlsx)
 library(rmarkdown)
-# library(sf)
+library(sf)
 
 load("spatial_data_all.RData")
 load("00_codes_inspireid.RData")
@@ -69,7 +69,7 @@ data.frame(do.call("rbind", operaciones)) -> x
 col_flatten(x, names(which(sapply(x, is.list))), drop = TRUE) -> x
 operaciones <- as.data.frame(x)
 names(operaciones) <- gsub("_1","", names(operaciones))
-# operaciones$Nombre <- iconv(operaciones$Nombre, from="UTF-8", to="LATIN1")
+operaciones$Nombre <- iconv(operaciones$Nombre, from="UTF-8", to="LATIN1")
 operaciones$CodIOE <- ifelse(operaciones$Cod_IOE != "", paste0("IOE",operaciones$Cod_IOE), "")
 
 ## population/health related ------
