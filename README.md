@@ -2,7 +2,7 @@
 
 Please refer to the [source](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=45) to get more information on how the service functions and how the [requests for data retrieval](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=48) should be pulled together.
 
-### Nomenclature:
+### Nomenclature
 
 - :rocket: [app.R](https://github.com/ordanovich/downloadINE/blob/master/app.R) combining **UI** and **server** parts.
 - :fork_and_knife: [global.R](https://github.com/ordanovich/downloadINE/blob/master/global.R) containing helper functions to be used by the [app.R](https://github.com/ordanovich/downloadINE/blob/master/app.R).
@@ -19,7 +19,7 @@ devtools::install_github("mrdwab/SOfun")
 pacman::p_load(RSQLite, magrittr, dplyr, RJSONIO, SOfun, data.table, plyr)
 ```
 
-## Available operations
+### Available operations
 
 ```r
 operaciones <-  "http://servicios.ine.es/wstempus/js/ES/OPERACIONES_DISPONIBLES"
@@ -60,7 +60,7 @@ In order to work further only with those datasets you could filter your data fra
 operaciones[operaciones$CodIOE %in% tables,c("Nombre", "CodIOE")] -> operaciones 
 ```
 
-## Available tables for the selected operations
+### Available tables for the selected operations
 
 ```r
 tt <- list()
@@ -84,7 +84,7 @@ for (i in sample(operaciones$CodIOE,1)) {
 
 > Note that we use the `sample()` function for the demonstration purposes. If you want to loop through the entire selection remove the sampling part.
 
-## Available data series
+### Available data series
 
 ```r
 ss <- list()
@@ -110,7 +110,7 @@ for (i in nn.tt) {
   
 }
 ```
-## Raw data extraction
+### Raw data extraction
 
 ```r
 
@@ -145,7 +145,7 @@ for (i in names(ss)) {
 }
 ```
 
-## Data clean-up & re-structuring.
+### Data clean-up & re-structuring.
 
 ```r
 datos_serie.df <- list()
