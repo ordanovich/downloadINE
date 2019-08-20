@@ -20,10 +20,6 @@ pacman::p_load(RSQLite, magrittr, dplyr, RJSONIO, SOfun, data.table, plyr)
 myFun <- function(data) {
                   ListCols <- sapply(data, is.list)
                   cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))}
-                  
-ms_to_date = function(ms, t0="1970-01-01", timezone) {
-                      sec = ms / 1000
-                      as.POSIXct(sec, origin=t0, tz=timezone)}
 ```
 
 ## Available operations
