@@ -15,22 +15,48 @@ Initialize the process by loading the required packages and setting up custom fu
 source("http://news.mrdwab.com/install_github.R")
 devtools::install_github("mrdwab/SOfun")
 
-pacman::p_load(RSQLite,magrittr, dplyr, RJSONIO,SOfun, data.table, plyr)
+pacman::p_load(RSQLite, magrittr, dplyr, RJSONIO, SOfun, data.table, plyr)
 
 myFun <- function(data) {
                   ListCols <- sapply(data, is.list)
-                  cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))
-}
+                  cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))}
+                  
 ms_to_date = function(ms, t0="1970-01-01", timezone) {
                       sec = ms / 1000
-                      as.POSIXct(sec, origin=t0, tz=timezone)
-}
+                      as.POSIXct(sec, origin=t0, tz=timezone)}
 ```
 
 ## Available operations
 
 ```r
+operaciones <-  "http://servicios.ine.es/wstempus/js/ES/OPERACIONES_DISPONIBLES"
 
+operaciones <- fromJSON(operaciones)
+data.frame(do.call("rbind", operaciones)) -> x
+col_flatten(x, names(which(sapply(x, is.list))), drop = TRUE) -> x
+operaciones <- as.data.frame(x)
 
+names(operaciones) <- gsub("_1","", names(operaciones))
+operaciones$Nombre <- iconv(operaciones$Nombre, from="UTF-8", to="LATIN1")
+operaciones$CodIOE <- ifelse(operaciones$Cod_IOE != "", paste0("IOE",operaciones$Cod_IOE), "")
 ```
+> Here are some of the statistical operations directly related with Health and Demographic topic:
 
+```r
+c("IOE30321", # Cifras de Poblacion
+  "IOE30245", # Cifras Oficiales de Poblacion de los Municipios Espanoles: Revision del Padron Municipal
+  "IOE30453", # Encuesta de Condiciones de Vida (ECV)
+  "IOE30414", # Encuesta de Morbilidad Hospitalaria
+  "IOE54009", # Encuesta Nacional de Salud (ENSE)
+  "IOE30279", # Estadadistica de Adquisiciones de Nacionalidad Espanola de Residentes
+  "IOE30417", # Estadadistica de Defunciones segun la Causa de Muerte
+  "IOE30259", # Estimaciones de la Poblacion Actual (ePOBa)
+  "IOE30264", # Indicadores Demograficos Basicos
+  "IOE30306", # MNP Estadastica de Defunciones
+  "IOE30302", # MNP Estadastica de Matrimonios
+  "IOE30304", # MNP Estadastica de Nacimientos
+  "IOE30301", # Movimiento Natural de la Poblacion (Resultados Provisionales)
+  "IOE30269", # Proyecciones de Poblacion a Corto Plazo
+  "IOE30270"  # Proyecciones de Poblacion a Largo Plazo
+) -> tables
+```
