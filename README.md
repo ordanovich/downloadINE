@@ -1,4 +1,4 @@
-## Interactive application for programmatic data retrieval from the [INEbase](https://www.ine.es/dyngs/INEbase/listaoperaciones.htm)
+## Interactive application for programmatic data retrieval from [INEbase](https://www.ine.es/dyngs/INEbase/listaoperaciones.htm)
 
 Please refer to the [source](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=45) to get more information on how the service functions and how the [requests for data retrieval](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=48) should be pulled together.
 
