@@ -902,13 +902,36 @@ shinyApp(
                                                               extend = "collection",
                                                               text = 'Download entire dataset',
                                                               action = DT::JS("function ( e, dt, node, config ) {
-                                                                              Shiny.setInputValue('test', true, {priority: 'event'});
+                                                                              Shiny.setInputValue('test3', true, {priority: 'event'});
   }")
                     )
                                                               )
                                                   )
                                       ))   
     
+    observeEvent(input$test3, {
+                print("hello")
+                showModal(myModal3())
+    })
+    
+    
+    output$download5 <- downloadHandler(
+                filename = function() {
+                            paste0("INEbase_spdf", ".csv")
+                },
+                content = function(file) {
+                            write.csv(spatial_data() %>% st_drop_geometry(), file)
+                }
+    )
+    
+    output$download6 <- downloadHandler(
+                filename = function() {
+                            paste0("INEbase_spdf", ".xlsx")
+                },
+                content = function(file) {
+                            write.xlsx(spatial_data() %>% st_drop_geometry(), file)
+                }
+    )
     
     output$downloadData <- downloadHandler(
                 filename <- function(){
@@ -917,7 +940,7 @@ shinyApp(
                 
                 content = function(file) {
                             dat <- spatial_data()
-                            save(dat, file = file)
+                            saveRDS(dat, file = file)
                 }
     )
     

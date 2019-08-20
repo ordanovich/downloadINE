@@ -45,6 +45,18 @@ myModal2 <- function() {
   )
 }
 
+
+myModal3 <- function() {
+            div(id = "test3",
+                modalDialog(downloadButton("download5","Download table as csv"),
+                            br(),
+                            br(),
+                            downloadButton("download6","Download table as xlsx"),
+                            
+                            easyClose = TRUE, title = "Download Table")
+            )
+}
+
 myFun <- function(data) {
   ListCols <- sapply(data, is.list)
   cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))
