@@ -9,17 +9,12 @@
 
 The application itself (use `shiny::runApp()` from the cloned repository or open the <a href="http://193.146.75.235/sample-apps/final_apps/ine_download/"  rel="noopener noreferrer" target="_blank">online version</a> to preview the app) pursues the goal to allow users to consult the contents of the data base, retrieve and visualize the desired datasets in a quick and easy-to-manipulate manner. 
 
-Initialize the process by loading the required packages and setting up custom functions:
+Initialize the process by loading (and installing if needed) the required packages:
 
 ```r
 source("http://news.mrdwab.com/install_github.R")
 devtools::install_github("mrdwab/SOfun")
-
 pacman::p_load(RSQLite, magrittr, dplyr, RJSONIO, SOfun, data.table, plyr)
-
-myFun <- function(data) {
-                  ListCols <- sapply(data, is.list)
-                  cbind(data[!ListCols], t(apply(data[ListCols], 1, unlist)))}
 ```
 
 ## Available operations
