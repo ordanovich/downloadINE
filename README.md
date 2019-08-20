@@ -2,7 +2,7 @@
 
 Please refer to the [source](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=45) to get more information on how the service functions and how the [requests for data retrieval](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=48) should be pulled together.
 
-:bookmark_tabs: Nomenclature:
+### Nomenclature:
 
 - :rocket: [app.R](https://github.com/ordanovich/downloadINE/blob/master/app.R) combining **UI** and **server** parts.
 - :fork_and_knife: [global.R](https://github.com/ordanovich/downloadINE/blob/master/global.R) containing helper functions to be used by the [app.R](https://github.com/ordanovich/downloadINE/blob/master/app.R).
