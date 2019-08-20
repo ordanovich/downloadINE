@@ -173,7 +173,8 @@ rbindlist(datos_serie.df, fill=T) -> datos_serie.df
 
 strsplit(datos_serie.df$Variable, ". ", fixed = TRUE) -> vars_splitted
 
-rbind.fill(lapply(vars_splitted, function(x)as.data.frame(t(x)))) %>% mutate_if(is.factor, as.character) -> vars_splitted_df
+rbind.fill(lapply(vars_splitted, function(x)as.data.frame(t(x)))) %>%
+                  mutate_if(is.factor, as.character) -> vars_splitted_df
 
 cbind(datos_serie.df, vars_splitted_df) -> datos_serie.df
 ```
