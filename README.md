@@ -164,7 +164,10 @@ for (i in loop) {
                   mutate_if(is.factor, as.character) %>%
                   mutate(Variable = table.name) %>%
                   mutate_if(is.character, function(x) iconv(x, from="UTF-8", to="LATIN1")) %>%
-                  mutate(Fecha = lubridate::as_datetime(Fecha/1000, origin ="1970-01-01", tz = "Europe/Madrid"))
+                  mutate(Fecha = lubridate::as_datetime(
+                                  Fecha/1000, 
+                                  origin ="1970-01-01", 
+                                  tz = "Europe/Madrid"))
     datos_serie.df[[i]] <- x
   }
 }
