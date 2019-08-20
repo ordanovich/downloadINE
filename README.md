@@ -145,7 +145,7 @@ for (i in names(ss)) {
 }
 ```
 
-## Data clean-up & structurisation
+## Data clean-up & re-structuring.
 
 ```r
 datos_serie.df <- list()
@@ -177,3 +177,5 @@ rbind.fill(lapply(vars_splitted, function(x)as.data.frame(t(x)))) %>% mutate_if(
 
 cbind(datos_serie.df, vars_splitted_df) -> datos_serie.df
 ```
+
+> Note that in the majority of the cases variables would be dot-separated, however some tables might have a different structure.
