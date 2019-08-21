@@ -1,6 +1,8 @@
+![](https://github.com/ordanovich/images/blob/master/portada_small.png?raw=true)
+
 ## Interactive application for programmatic data retrieval from [INEbase](https://www.ine.es/dyngs/INEbase/listaoperaciones.htm)
 
-Please refer to [www.ine.es](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=45) to get more information on how the Web Services function and how the [requests for data retrieval](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=48) should be pulled together.
+Please refer to the source to get more information on how the [Web Services](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=45) function and how the [requests for data retrieval](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=48) should be pulled together.
 
 ### Nomenclature
 
