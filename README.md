@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/ordanovich/images/blob/master/portada_small.png?raw=true">
+  <img src="https://github.com/ordanovich/images/blob/master/portadaWlogos.png?raw=true">
 </p>
 
 ## Interactive application for programmatic data retrieval from [INEbase](https://www.ine.es/dyngs/INEbase/listaoperaciones.htm)
